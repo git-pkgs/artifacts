@@ -1,9 +1,11 @@
 package artifacts
 
 import (
+	_ "crypto/sha256"
 	_ "crypto/sha512"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/git-pkgs/purl"
 	"github.com/opencontainers/go-digest"
@@ -52,25 +54,12 @@ func validate(packageURL string, contentDigest digest.Digest, size int64) (strin
 		return "", fmt.Errorf("PURL: %w", err)
 	}
 	if parsed.Subpath != "" {
-		parsed.Subpath, err = url.PathUnescape(parsed.Subpath)
+		parsed.Subpath, err = canonicalSubpath(parsed.Subpath)
 		if err != nil {
-			return "", fmt.Errorf("PURL subpath: %w", err)
+			return "", err
 		}
 	}
 	canonicalPURL := parsed.String()
-	reparsed, err := purl.Parse(canonicalPURL)
-	if err != nil {
-		return "", fmt.Errorf("PURL canonical form: %w", err)
-	}
-	if reparsed.Subpath != "" {
-		reparsed.Subpath, err = url.PathUnescape(reparsed.Subpath)
-		if err != nil {
-			return "", fmt.Errorf("PURL canonical subpath: %w", err)
-		}
-	}
-	if reparsed.String() != canonicalPURL {
-		return "", fmt.Errorf("PURL: canonical form is not stable")
-	}
 	if err := contentDigest.Validate(); err != nil {
 		return "", fmt.Errorf("digest: %w", err)
 	}
@@ -79,4 +68,45 @@ func validate(packageURL string, contentDigest digest.Digest, size int64) (strin
 	}
 
 	return canonicalPURL, nil
+}
+
+func canonicalSubpath(subpath string) (string, error) {
+	decode := strings.Contains(subpath, "%")
+	remainder := subpath
+	var canonical strings.Builder
+	if decode {
+		canonical.Grow(len(subpath))
+	}
+
+	for first := true; ; first = false {
+		rawSegment, next, found := strings.Cut(remainder, "/")
+		segment, err := url.PathUnescape(rawSegment)
+		if err != nil {
+			return "", fmt.Errorf("PURL subpath: %w", err)
+		}
+		if segment == "" {
+			return "", fmt.Errorf("PURL subpath: segment %q is empty", rawSegment)
+		}
+		if segment == "." || segment == ".." {
+			return "", fmt.Errorf("PURL subpath: segment %q is not allowed", segment)
+		}
+		if strings.Contains(segment, "/") {
+			return "", fmt.Errorf("PURL subpath: segment %q contains a slash", segment)
+		}
+		if decode {
+			if !first {
+				canonical.WriteByte('/')
+			}
+			canonical.WriteString(segment)
+		}
+		if !found {
+			break
+		}
+		remainder = next
+	}
+
+	if decode {
+		return canonical.String(), nil
+	}
+	return subpath, nil
 }

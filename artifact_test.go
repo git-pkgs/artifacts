@@ -75,6 +75,11 @@ func TestNewRejectsInvalidPURL(t *testing.T) {
 		{name: "empty"},
 		{name: "malformed", value: "not-a-purl"},
 		{name: "malformed encoding", value: "pkg:npm/example@1.0.0#docs%zz"},
+		{name: "empty subpath segment", value: "pkg:npm/example@1.0.0#docs//examples"},
+		{name: "current directory subpath", value: "pkg:npm/example@1.0.0#./docs"},
+		{name: "parent directory subpath", value: "pkg:npm/example@1.0.0#../docs"},
+		{name: "encoded parent directory subpath", value: "pkg:npm/example@1.0.0#%2E%2E/docs"},
+		{name: "encoded slash in subpath", value: "pkg:npm/example@1.0.0#docs%2Fexamples"},
 	}
 
 	for _, test := range tests {
