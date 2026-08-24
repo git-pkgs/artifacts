@@ -1,3 +1,5 @@
+github.com/git-pkgs/integrity v0.1.1 h1:nHQ7SktOiGM1dOb5BFnkdtttG/6FCgE6r5ru6QnsGts=
+github.com/git-pkgs/integrity v0.1.1/go.mod h1:hxu24lcd230377hCF28JQW7sGcCbuNLqo/0ULeb+F1Q=
 github.com/git-pkgs/purl v0.1.16 h1:VAX6tv0hhdTENbkrGMoPZbOAl1Y8U1/ZnzoCsYuNBYM=
 github.com/git-pkgs/purl v0.1.16/go.mod h1:7u7ora8tQdrkS7Auclr5v8dCJdjN4ej6AbrvYZi2b7k=
 github.com/git-pkgs/vers v0.3.1 h1:jy/ht2wIRJI5zQrccm6GTeYr+hGFwe2z8LV1HOr4Wco=
