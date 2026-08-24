@@ -52,6 +52,64 @@ func TestAcquireReturnsStoredArtifact(t *testing.T) {
 	}
 }
 
+func TestAcquisitionRejectsOversizeStoredArtifact(t *testing.T) {
+	content := []byte("stored package")
+	stored := testArtifact(t, testPURL, "example.tgz", content)
+	tests := []struct {
+		name string
+		call func(Service) (*Result, error)
+	}{
+		{
+			name: "Acquire",
+			call: func(service Service) (*Result, error) {
+				return service.Acquire(
+					context.Background(),
+					Request{PURL: testPURL},
+					Options{MaxBytes: int64(len(content) - 1)},
+				)
+			},
+		},
+		{
+			name: "AcquireFrom",
+			call: func(service Service) (*Result, error) {
+				return service.AcquireFrom(
+					context.Background(),
+					Request{PURL: testPURL},
+					Source{URL: "https://registry.example/example.tgz"},
+					Options{MaxBytes: int64(len(content) - 1)},
+				)
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			body := &trackingBody{Reader: bytes.NewReader(content)}
+			store := &testStore{
+				open: func(context.Context, Request) (*Entry, error) {
+					return &Entry{Artifact: stored, Body: body}, nil
+				},
+			}
+			resolver := &testResolver{}
+			fetcher := &testFetcher{}
+
+			result, err := test.call(Service{Resolver: resolver, Fetcher: fetcher, Store: store})
+			if !errors.Is(err, ErrTooLarge) {
+				t.Fatalf("acquisition error = %v, want ErrTooLarge", err)
+			}
+			if result != nil {
+				t.Errorf("result = %+v, want nil", result)
+			}
+			if !body.closed {
+				t.Error("stored body was not closed")
+			}
+			if resolver.calls != 0 || fetcher.calls != 0 {
+				t.Errorf("resolver calls = %d, fetcher calls = %d, want zero", resolver.calls, fetcher.calls)
+			}
+		})
+	}
+}
+
 func TestAcquireOfflineMiss(t *testing.T) {
 	store := missingStore()
 	resolver := &testResolver{}

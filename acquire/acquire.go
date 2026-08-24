@@ -119,7 +119,7 @@ func (service Service) Acquire(ctx context.Context, request Request, options Opt
 		return nil, err
 	}
 	if entry != nil {
-		return resultFromEntry(entry, true), nil
+		return resultFromEntry(entry, options.MaxBytes)
 	}
 	if options.Offline {
 		return nil, fmt.Errorf("%w: %s", ErrOffline, request.PURL)
@@ -168,7 +168,7 @@ func (service Service) acquireSource(
 		return nil, err
 	}
 	if entry != nil {
-		return resultFromEntry(entry, true), nil
+		return resultFromEntry(entry, options.MaxBytes)
 	}
 	if options.Offline {
 		return nil, fmt.Errorf("%w: %s", ErrOffline, request.PURL)
@@ -426,10 +426,19 @@ func resultDigest(result integrity.Result, algorithm integrity.Algorithm) (integ
 	return integrity.Digest{}, fmt.Errorf("no %s digest", algorithm)
 }
 
-func resultFromEntry(entry *Entry, cached bool) *Result {
+func resultFromEntry(entry *Entry, maxBytes int64) (*Result, error) {
+	if maxBytes > 0 && entry.Artifact.Size > maxBytes {
+		_ = entry.Body.Close()
+		return nil, fmt.Errorf(
+			"%w: stored %d bytes, limit %d",
+			ErrTooLarge,
+			entry.Artifact.Size,
+			maxBytes,
+		)
+	}
 	return &Result{
 		Artifact: entry.Artifact,
 		Body:     entry.Body,
-		Cached:   cached,
-	}
+		Cached:   true,
+	}, nil
 }
