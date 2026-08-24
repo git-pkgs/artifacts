@@ -214,6 +214,14 @@ func (service Service) stageDownload(
 	if err != nil {
 		return nil, fmt.Errorf("verify artifact %s: %w", request.PURL, err)
 	}
+	if download.Size >= 0 && hashed.Bytes != download.Size {
+		return nil, fmt.Errorf(
+			"verify artifact %s: downloaded %d bytes; declared size is %d",
+			request.PURL,
+			hashed.Bytes,
+			download.Size,
+		)
+	}
 	sha256Digest, err := resultDigest(hashed, integrity.SHA256)
 	if err != nil {
 		return nil, fmt.Errorf("hash artifact %s: %w", request.PURL, err)

@@ -375,6 +375,47 @@ func TestAcquireRejectsStreamingOversizeAndDiscards(t *testing.T) {
 	}
 }
 
+func TestAcquireRejectsDownloadSizeMismatchAndDiscards(t *testing.T) {
+	content := []byte("package")
+	tests := []struct {
+		name         string
+		declaredSize int64
+	}{
+		{name: "truncated", declaredSize: int64(len(content) + 1)},
+		{name: "overlong", declaredSize: int64(len(content) - 1)},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			store := missingStore()
+			body := &trackingBody{Reader: bytes.NewReader(content)}
+			service := Service{
+				Resolver: &testResolver{source: Source{URL: "https://registry.example/package.tgz"}},
+				Fetcher: &testFetcher{download: &Download{
+					Body: body,
+					Size: test.declaredSize,
+				}},
+				Store: store,
+			}
+
+			_, err := service.Acquire(context.Background(), Request{PURL: testPURL}, Options{})
+			wantError := fmt.Sprintf("downloaded %d bytes; declared size is %d", len(content), test.declaredSize)
+			if err == nil || !strings.Contains(err.Error(), wantError) {
+				t.Fatalf("Acquire() error = %v, want %q", err, wantError)
+			}
+			if store.stage == nil || !store.stage.discarded {
+				t.Error("size-mismatched stage was not discarded")
+			}
+			if store.stage.committed {
+				t.Error("size-mismatched stage was committed")
+			}
+			if !body.closed {
+				t.Error("size-mismatched download body was not closed")
+			}
+		})
+	}
+}
+
 func TestAcquireAllowsMaximumSizeLimit(t *testing.T) {
 	content := []byte("package")
 	store := missingStore()
