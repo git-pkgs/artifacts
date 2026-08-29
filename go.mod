@@ -4,7 +4,7 @@ go 1.25.6
 
 require (
 	github.com/git-pkgs/integrity v0.1.1
-	github.com/git-pkgs/purl v0.1.16
+	github.com/git-pkgs/purl v0.1.17
 	github.com/opencontainers/go-digest v1.0.0
 )
 
