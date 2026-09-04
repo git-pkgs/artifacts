@@ -1,10 +1,10 @@
 github.com/git-pkgs/integrity v0.1.1 h1:nHQ7SktOiGM1dOb5BFnkdtttG/6FCgE6r5ru6QnsGts=
 github.com/git-pkgs/integrity v0.1.1/go.mod h1:hxu24lcd230377hCF28JQW7sGcCbuNLqo/0ULeb+F1Q=
-github.com/git-pkgs/purl v0.1.17 h1:oRSd8tqllTLl74Wa4WnuqU500hXd9OdUnImOEswQUVE=
-github.com/git-pkgs/purl v0.1.17/go.mod h1:7u7ora8tQdrkS7Auclr5v8dCJdjN4ej6AbrvYZi2b7k=
-github.com/git-pkgs/vers v0.3.1 h1:jy/ht2wIRJI5zQrccm6GTeYr+hGFwe2z8LV1HOr4Wco=
-github.com/git-pkgs/vers v0.3.1/go.mod h1:biTbSQK1qdbrsxDEKnqe3Jzclxz8vW6uDcwKjfUGcOo=
+github.com/git-pkgs/purl v0.1.20 h1:a4qzvUy5mBZ2GGjOQNW2h/ocFqjTjOiTDMv2ONtivmM=
+github.com/git-pkgs/purl v0.1.20/go.mod h1:hthV5mp+Q67HpQ9+LnRLLmsReu5ooyQ5EaJsCGrA8yE=
+github.com/git-pkgs/vers v0.6.0 h1:droJw8+oSyl8/UoDj/96B9ZPggmxJDTl/JeixzfKzSc=
+github.com/git-pkgs/vers v0.6.0/go.mod h1:biTbSQK1qdbrsxDEKnqe3Jzclxz8vW6uDcwKjfUGcOo=
 github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8Oi/yOhh5U=
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
-github.com/package-url/packageurl-go v0.1.6 h1:YO3p6u1XmCUliivUg/qWphaY8vI6hxSnnPv7Bfg3m5M=
-github.com/package-url/packageurl-go v0.1.6/go.mod h1:nKAWB8E6uk1MHqiS/lQb9pYBGH2+mdJ2PJc2s50dQY0=
+github.com/package-url/packageurl-go v0.1.7 h1:iFWg6tzAjLA6F/qX3M5nZaiMHJgc+p2zxVyr/fY+sZY=
+github.com/package-url/packageurl-go v0.1.7/go.mod h1:nKAWB8E6uk1MHqiS/lQb9pYBGH2+mdJ2PJc2s50dQY0=
