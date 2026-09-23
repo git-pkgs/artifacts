@@ -58,4 +58,4 @@ make lint
 
 ## License
 
-MIT
+[MIT](LICENSE).
